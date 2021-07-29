@@ -70,6 +70,7 @@ if (process.env.__NEXT_I18N_SUPPORT) {
 }
 
 const basePath = (process.env.__NEXT_ROUTER_BASEPATH as string) || ''
+const assestPrefix = (process.env.__NEXT_ROUTER_ASSETPREFIX as string) || ''
 
 function buildCancellationError() {
   return Object.assign(new Error('Route Cancelled'), {
@@ -156,6 +157,10 @@ function pathNoQueryHash(path: string) {
 export function hasBasePath(path: string): boolean {
   path = pathNoQueryHash(path)
   return path === basePath || path.startsWith(basePath + '/')
+}
+
+export function addAssetPrefix(path: string): string {
+  return addPathPrefix(path, assestPrefix)
 }
 
 export function addBasePath(path: string): string {
@@ -491,7 +496,7 @@ function fetchRetry(url: string, attempts: number): Promise<any> {
 }
 
 function fetchNextData(dataHref: string, isServerRender: boolean) {
-  return fetchRetry(dataHref, isServerRender ? 3 : 1).catch((err: Error) => {
+  return fetchRetry(addAssetPrefix(dataHref), isServerRender ? 3 : 1).catch((err: Error) => {
     // We should only trigger a server-side transition if this was caused
     // on a client-side transition. Otherwise, we'd get into an infinite
     // loop.
